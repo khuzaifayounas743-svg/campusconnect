@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import type { ReactNode } from 'react'
 
 type Message = {
   id: string
@@ -19,7 +18,6 @@ const QUICK_PROMPTS = [
 ]
 
 export default function AIChatbot() {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -77,7 +75,7 @@ export default function AIChatbot() {
       // Prepare history (exclude welcome)
       const history = updatedMessages
         .filter((m) => m.id !== 'welcome')
-        .slice(0, -1) // exclude the message we just added
+        .slice(0, -1)
         .map((m) => ({
           role: m.role,
           content: m.content,
@@ -95,7 +93,6 @@ export default function AIChatbot() {
       const result = await res.json()
 
       if (result.success) {
-        // Extract post IDs from response to make clickable
         const reply = result.reply
 
         setMessages((prev) => [
@@ -126,7 +123,7 @@ export default function AIChatbot() {
         {
           id: `error-${Date.now()}`,
           role: 'assistant',
-          content: "Network error. Please check your connection. 🌐",
+          content: 'Network error. Please check your connection. 🌐',
           timestamp: new Date(),
         },
       ])
@@ -154,15 +151,13 @@ export default function AIChatbot() {
     ])
   }
 
-  // Render message with markdown-like formatting
+  // Render message with markdown-like formatting (bold **text**)
   const renderMessage = (content: string) => {
-    // Split by lines
     const lines = content.split('\n')
 
     return lines.map((line, idx) => {
-      // Bold **text**
       const boldRegex = /\*\*(.*?)\*\*/g
-      const parts: (string | JSX.Element)[] = []
+      const parts: ReactNode[] = []
       let lastIndex = 0
       let match
 
