@@ -1,26 +1,372 @@
 @import "tailwindcss";
 
+/* ============================================
+   THEMES
+   ============================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* LIGHT THEME (default) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-gradient-from: #eef2ff;
+  --bg-gradient-via: #ffffff;
+  --bg-gradient-to: #faf5ff;
+  --bg-card: rgba(255, 255, 255, 0.7);
+  --bg-card-border: rgba(255, 255, 255, 0.5);
+  --bg-header: rgba(255, 255, 255, 0.6);
+  --bg-input: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border-primary: #e2e8f0;
+  --border-secondary: rgba(255, 255, 255, 0.8);
+  --accent-from: #6366f1;
+  --accent-to: #a855f7;
+  --blob-1: rgba(196, 181, 253, 0.6);
+  --blob-2: rgba(165, 180, 252, 0.6);
+  --blob-3: rgba(251, 207, 232, 0.5);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+[data-theme='dark'] {
+  /* DARK THEME */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-gradient-from: #0f172a;
+  --bg-gradient-via: #1e1b4b;
+  --bg-gradient-to: #1e293b;
+  --bg-card: rgba(30, 41, 59, 0.6);
+  --bg-card-border: rgba(148, 163, 184, 0.15);
+  --bg-header: rgba(15, 23, 42, 0.7);
+  --bg-input: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+  --border-primary: #334155;
+  --border-secondary: rgba(148, 163, 184, 0.2);
+  --accent-from: #818cf8;
+  --accent-to: #c084fc;
+  --blob-1: rgba(99, 102, 241, 0.25);
+  --blob-2: rgba(168, 85, 247, 0.25);
+  --blob-3: rgba(236, 72, 153, 0.2);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+[data-theme='sunset'] {
+  /* SUNSET THEME */
+  --bg-primary: #fff7ed;
+  --bg-secondary: #ffedd5;
+  --bg-gradient-from: #fef3c7;
+  --bg-gradient-via: #fff7ed;
+  --bg-gradient-to: #ffe4e6;
+  --bg-card: rgba(255, 255, 255, 0.65);
+  --bg-card-border: rgba(254, 215, 170, 0.6);
+  --bg-header: rgba(255, 247, 237, 0.7);
+  --bg-input: #ffffff;
+  --text-primary: #431407;
+  --text-secondary: #7c2d12;
+  --text-muted: #a16207;
+  --border-primary: #fed7aa;
+  --border-secondary: rgba(254, 215, 170, 0.8);
+  --accent-from: #f97316;
+  --accent-to: #ec4899;
+  --blob-1: rgba(251, 146, 60, 0.4);
+  --blob-2: rgba(236, 72, 153, 0.35);
+  --blob-3: rgba(250, 204, 21, 0.4);
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes blob {
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--accent-from) 0%,
+    var(--accent-to) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--bg-card-border);
+}
+
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shine::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.btn-shine:hover::before {
+  left: 100%;
+}
+
+/* ============================================
+   THEME-AWARE OVERRIDES
+   ============================================ */
+
+.theme-bg {
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-from) 0%,
+    var(--bg-gradient-via) 50%,
+    var(--bg-gradient-to) 100%
+  );
+}
+
+.theme-card {
+  background: var(--bg-card);
+  border: 1px solid var(--bg-card-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.theme-header {
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--bg-card-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.theme-input {
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+}
+
+.theme-input:focus {
+  outline: none;
+  border-color: var(--accent-from);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.theme-text-primary {
+  color: var(--text-primary);
+}
+
+.theme-text-secondary {
+  color: var(--text-secondary);
+}
+
+.theme-text-muted {
+  color: var(--text-muted);
+}
+
+.theme-btn-primary {
+  background: linear-gradient(
+    135deg,
+    var(--accent-from) 0%,
+    var(--accent-to) 100%
+  );
+  color: white;
+}
+
+.theme-btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* Dark theme text fixes for readability */
+[data-theme='dark'] .text-gray-900,
+[data-theme='dark'] .text-gray-800,
+[data-theme='dark'] .text-gray-700 {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .text-gray-600,
+[data-theme='dark'] .text-gray-500 {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .text-gray-400 {
+  color: var(--text-muted);
+}
+
+[data-theme='dark'] .bg-white,
+[data-theme='dark'] .bg-gray-50,
+[data-theme='dark'] .bg-gray-100 {
+  background-color: var(--bg-secondary);
+}
+
+[data-theme='dark'] .bg-white\/70,
+[data-theme='dark'] .bg-white\/60,
+[data-theme='dark'] .bg-white\/40 {
+  background-color: var(--bg-header);
+}
+
+[data-theme='dark'] .border-gray-200,
+[data-theme='dark'] .border-gray-100,
+[data-theme='dark'] .border-white\/40,
+[data-theme='dark'] .border-white\/50,
+[data-theme='dark'] .border-white\/60,
+[data-theme='dark'] .border-white\/80 {
+  border-color: var(--border-primary);
+}
+
+[data-theme='sunset'] .text-gray-900,
+[data-theme='sunset'] .text-gray-800,
+[data-theme='sunset'] .text-gray-700 {
+  color: var(--text-primary);
+}
+
+[data-theme='sunset'] .text-gray-600,
+[data-theme='sunset'] .text-gray-500 {
+  color: var(--text-secondary);
+}
+
+
+/* ============================================
+   HIGHLIGHT ANIMATIONS (Deep Link)
+   ============================================ */
+
+@keyframes commentHighlight {
+  0% {
+    background-color: rgba(99, 102, 241, 0.2);
+    transform: scale(1.02);
+  }
+  50% {
+    background-color: rgba(99, 102, 241, 0.15);
+  }
+  100% {
+    background-color: transparent;
+    transform: scale(1);
+  }
+}
+
+.comment-highlighted {
+  animation: commentHighlight 3s ease-out;
+  border-radius: 1rem;
 }
