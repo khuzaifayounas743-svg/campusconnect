@@ -9,7 +9,7 @@ import AISearchBar from './ai-search-bar'
 
 type User = {
   id: string
-  email: string
+  email: string | undefined
   user_metadata: {
     full_name?: string
     avatar_url?: string

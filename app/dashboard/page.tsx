@@ -87,11 +87,7 @@ export default async function DashboardPage() {
           {/* Middle Feed — WIDER */}
           <main className="flex-1 min-w-0">
             {/* Welcome Banner (simple text) */}
-            <WelcomeBanner
-              userName={userName}
-              postsCount={postsCount}
-              likedCount={likedPostIds.size}
-            />
+            <WelcomeBanner userName={userName} />
 
             {/* Feed Header */}
             <div className="mb-4">
