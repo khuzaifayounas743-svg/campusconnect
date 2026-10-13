@@ -11,6 +11,7 @@ type Result = {
   full_name: string | null
   avatar_url: string | null
   university: string | null
+  program: string | null
 }
 
 export default function SearchBar() {
@@ -36,7 +37,7 @@ export default function SearchBar() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Debounced search (email NOT fetched — privacy)
+  // Debounced search
   useEffect(() => {
     if (query.trim().length < 2) {
       setResults([])
@@ -48,9 +49,9 @@ export default function SearchBar() {
     const timer = setTimeout(async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url, university')
+        .select('id, full_name, avatar_url, university, program')
         .or(
-          `full_name.ilike.%${query}%,email.ilike.%${query}%,university.ilike.%${query}%`
+          `full_name.ilike.%${query}%,email.ilike.%${query}%,university.ilike.%${query}%,program.ilike.%${query}%`
         )
         .limit(6)
 
@@ -70,10 +71,13 @@ export default function SearchBar() {
   }
 
   return (
-    <div className="relative w-full max-w-md" ref={wrapperRef}>
+    <div className="relative w-full" ref={wrapperRef}>
       <form onSubmit={handleSubmit}>
         <div className="relative">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 theme-text-muted pointer-events-none">
+          <div
+            className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ color: 'var(--cc-text-muted)' }}
+          >
             <svg
               className="w-4 h-4"
               fill="none"
@@ -96,15 +100,26 @@ export default function SearchBar() {
               setOpen(true)
             }}
             onFocus={() => setOpen(true)}
-            placeholder="Search users..."
-            className="w-full pl-10 pr-4 py-2 text-sm rounded-xl theme-input outline-none transition-all"
+            placeholder="Search posts, events, friends..."
+            className="w-full pl-11 pr-4 py-2.5 text-sm rounded-2xl outline-none transition-all border"
+            style={{
+              backgroundColor: 'var(--cc-bg)',
+              borderColor: 'var(--cc-border)',
+              color: 'var(--cc-text)',
+            }}
           />
         </div>
       </form>
 
       {/* Dropdown results */}
       {open && query.trim().length >= 2 && (
-        <div className="absolute top-full left-0 right-0 mt-2 rounded-2xl theme-card shadow-2xl ring-1 ring-black/5 overflow-hidden z-50 animate-scale-in max-h-96 overflow-y-auto">
+        <div
+          className="absolute top-full left-0 right-0 mt-2 rounded-2xl shadow-2xl border overflow-hidden z-50 max-h-96 overflow-y-auto"
+          style={{
+            backgroundColor: 'var(--cc-surface)',
+            borderColor: 'var(--cc-border)',
+          }}
+        >
           {loading ? (
             <div className="p-4 space-y-3">
               {[1, 2, 3].map((i) => (
@@ -121,54 +136,78 @@ export default function SearchBar() {
             <>
               <div
                 className="divide-y"
-                style={{ borderColor: 'var(--border-primary)' }}
+                style={{ borderColor: 'var(--cc-border)' }}
               >
-                {results.map((user) => (
-                  <Link
-                    key={user.id}
-                    href={`/profile/${user.id}`}
-                    onClick={() => {
-                      setOpen(false)
-                      setQuery('')
-                    }}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-white/40 transition-colors"
-                  >
-                    <UserAvatar
-                      userId={user.id}
-                      name={user.full_name}
-                      avatarUrl={user.avatar_url}
-                      size="sm"
-                      clickable={false}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm theme-text-primary truncate">
-                        {user.full_name || 'User'}
-                      </p>
-                      {/* Email hatao — sirf university */}
-                      <p className="text-xs theme-text-muted truncate">
-                        {user.university || 'Student'}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
+                {results.map((user) => {
+                  const shortUni = user.university?.split(' - ')[0] || null
+                  return (
+                    <Link
+                      key={user.id}
+                      href={`/profile/${user.id}`}
+                      onClick={() => {
+                        setOpen(false)
+                        setQuery('')
+                      }}
+                      className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--cc-hover)]"
+                    >
+                      <UserAvatar
+                        userId={user.id}
+                        name={user.full_name}
+                        avatarUrl={user.avatar_url}
+                        size="sm"
+                        clickable={false}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className="font-semibold text-sm truncate"
+                          style={{ color: 'var(--cc-text)' }}
+                        >
+                          {user.full_name || 'User'}
+                        </p>
+                        <p
+                          className="text-xs truncate"
+                          style={{ color: 'var(--cc-text-muted)' }}
+                        >
+                          {shortUni && user.program
+                            ? `🎓 ${shortUni} · ${user.program}`
+                            : shortUni
+                            ? `🎓 ${shortUni}`
+                            : user.program || 'Student'}
+                        </p>
+                      </div>
+                    </Link>
+                  )
+                })}
               </div>
               <button
                 onClick={handleSubmit}
-                className="w-full px-4 py-3 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 transition-colors border-t"
-                style={{ borderColor: 'var(--border-primary)' }}
+                className="w-full px-4 py-3 text-xs font-semibold transition-colors border-t"
+                style={{
+                  color: 'var(--cc-primary)',
+                  borderColor: 'var(--cc-border)',
+                }}
               >
                 See all results for &quot;{query}&quot; →
               </button>
             </>
           ) : (
             <div className="p-6 text-center">
-              <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+              <div
+                className="w-12 h-12 mx-auto mb-3 rounded-2xl flex items-center justify-center"
+                style={{ backgroundColor: 'var(--cc-hover)' }}
+              >
                 <span className="text-2xl">🔍</span>
               </div>
-              <p className="text-sm font-semibold theme-text-primary mb-1">
+              <p
+                className="text-sm font-semibold mb-1"
+                style={{ color: 'var(--cc-text)' }}
+              >
                 No users found
               </p>
-              <p className="text-xs theme-text-muted">
+              <p
+                className="text-xs"
+                style={{ color: 'var(--cc-text-muted)' }}
+              >
                 Try a different name or university
               </p>
             </div>

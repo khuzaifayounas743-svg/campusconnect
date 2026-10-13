@@ -370,3 +370,60 @@ body {
   animation: commentHighlight 3s ease-out;
   border-radius: 1rem;
 }
+
+/* ============================================
+   CAMPUSCONNECT PURPLE THEME
+   ============================================ */
+
+:root {
+  /* Reference image purple theme */
+  --cc-bg: #f5f3ff;
+  --cc-surface: #ffffff;
+  --cc-primary: #6b46c1;
+  --cc-primary-dark: #553c9a;
+  --cc-primary-light: #805ad5;
+  --cc-accent: #9f7aea;
+  --cc-text: #1a202c;
+  --cc-text-secondary: #4a5568;
+  --cc-text-muted: #a0aec0;
+  --cc-border: #e9d8fd;
+  --cc-hover: #faf5ff;
+  --cc-sidebar-bg: #ffffff;
+  --cc-navbar-bg: #ffffff;
+}
+
+[data-theme='dark'] {
+  --cc-bg: #0f0a1f;
+  --cc-surface: #1a1433;
+  --cc-primary: #9f7aea;
+  --cc-primary-dark: #805ad5;
+  --cc-primary-light: #b794f4;
+  --cc-accent: #c084fc;
+  --cc-text: #f5f3ff;
+  --cc-text-secondary: #d6bcfa;
+  --cc-text-muted: #805ad5;
+  --cc-border: #2d1b69;
+  --cc-hover: #241a4d;
+  --cc-sidebar-bg: #1a1433;
+  --cc-navbar-bg: #1a1433;
+}
+
+.cc-bg {
+  background-color: var(--cc-bg);
+}
+
+.cc-surface {
+  background-color: var(--cc-surface);
+}
+
+.cc-text {
+  color: var(--cc-text);
+}
+
+.cc-text-secondary {
+  color: var(--cc-text-secondary);
+}
+
+.cc-text-muted {
+  color: var(--cc-text-muted);
+}

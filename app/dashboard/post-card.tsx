@@ -31,6 +31,9 @@ type Author = {
   id: string
   full_name: string | null
   avatar_url: string | null
+  university: string | null
+  program: string | null
+  semester: string | null
 }
 
 export default function PostCard({
@@ -52,24 +55,23 @@ export default function PostCard({
   const [liked, setLiked] = useState(initialLiked)
   const [likeCount, setLikeCount] = useState(post.likes?.[0]?.count || 0)
   const [loading, setLoading] = useState(false)
-const [showComments, setShowComments] = useState(autoOpenComments)
+  const [showComments, setShowComments] = useState(autoOpenComments)
   const [commentCount, setCommentCount] = useState(
     post.comments?.[0]?.count || 0
   )
   const [showImageViewer, setShowImageViewer] = useState(false)
   const [author, setAuthor] = useState<Author | null>(null)
-  // 🔑 Client-only time string to avoid hydration mismatch
   const [timeText, setTimeText] = useState<string>('')
 
   const isOwnPost = post.user_id === currentUserId
 
-  // Fetch author info
+  // Fetch author info with university + program
   useEffect(() => {
     if (!showAuthor) return
     const fetchAuthor = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url')
+        .select('id, full_name, avatar_url, university, program, semester')
         .eq('id', post.user_id)
         .single()
       if (data) setAuthor(data)
@@ -77,7 +79,7 @@ const [showComments, setShowComments] = useState(autoOpenComments)
     fetchAuthor()
   }, [post.user_id, showAuthor, supabase])
 
-  // 🔑 Compute timeAgo client-side only (prevents SSR/CSR mismatch)
+  // Client-only time
   useEffect(() => {
     const computeTime = () => {
       const seconds = Math.floor(
@@ -91,8 +93,6 @@ const [showComments, setShowComments] = useState(autoOpenComments)
     }
 
     setTimeText(computeTime())
-
-    // Update every 60 seconds
     const interval = setInterval(() => {
       setTimeText(computeTime())
     }, 60000)
@@ -100,7 +100,6 @@ const [showComments, setShowComments] = useState(autoOpenComments)
     return () => clearInterval(interval)
   }, [post.created_at])
 
-  // 🔑 Save scroll position before navigating to profile
   const saveScrollPosition = () => {
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('feedScrollPosition', window.scrollY.toString())
@@ -136,18 +135,8 @@ const [showComments, setShowComments] = useState(autoOpenComments)
   const formatEventDate = (date: string) => {
     const d = new Date(date)
     const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ]
     const month = months[d.getUTCMonth()]
     const day = d.getUTCDate()
@@ -162,6 +151,9 @@ const [showComments, setShowComments] = useState(autoOpenComments)
       time: `${hours}:${minStr} ${ampm}`,
     }
   }
+
+  // Shorten university name (COMSATS University - Lahore → COMSATS)
+  const shortUniversity = author?.university?.split(' - ')[0] || null
 
   return (
     <>
@@ -189,10 +181,24 @@ const [showComments, setShowComments] = useState(autoOpenComments)
               >
                 {author?.full_name || 'User'}
               </Link>
-              <p className="text-xs theme-text-muted">{timeText || '...'}</p>
+              <div className="flex items-center gap-1.5 text-xs theme-text-muted flex-wrap">
+                {shortUniversity && (
+                  <span className="inline-flex items-center gap-0.5 truncate">
+                    🎓 {shortUniversity}
+                  </span>
+                )}
+                {author?.program && (
+                  <>
+                    <span>·</span>
+                    <span className="truncate">{author.program}</span>
+                  </>
+                )}
+              </div>
+              <p className="text-xs theme-text-muted mt-0.5">
+                {timeText || '...'}
+              </p>
             </div>
 
-            {/* Follow button for others */}
             {!isOwnPost && (
               <FollowButton
                 targetUserId={post.user_id}
@@ -201,7 +207,6 @@ const [showComments, setShowComments] = useState(autoOpenComments)
               />
             )}
 
-            {/* 3-dot menu for own posts */}
             <PostMenu post={post} currentUserId={currentUserId} />
           </div>
         )}
@@ -331,13 +336,13 @@ const [showComments, setShowComments] = useState(autoOpenComments)
 
         {/* ============ COMMENTS ============ */}
         {showComments && (
-  <CommentSection
-    postId={post.id}
-    currentUserId={currentUserId}
-    onCommentAdded={() => setCommentCount((c) => c + 1)}
-    highlightCommentId={highlightCommentId}
-  />
-)}
+          <CommentSection
+            postId={post.id}
+            currentUserId={currentUserId}
+            onCommentAdded={() => setCommentCount((c) => c + 1)}
+            highlightCommentId={highlightCommentId}
+          />
+        )}
       </article>
 
       {/* ============ IMAGE VIEWER ============ */}
